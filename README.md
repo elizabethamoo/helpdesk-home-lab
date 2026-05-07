@@ -1,13 +1,13 @@
 # 🖥️ IT Help Desk Home Lab — Elizabeth Amoo
 
-> **A practical ServiceDesk Plus ticketing simulation demonstrating Tier 1 IT support skills**  
-> Tools: ServiceDesk Plus · Windows 10/11 · Azure AD · TCP/IP · Remote Support
+> **A practical ServiceDesk ticketing simulation demonstrating Tier 1 IT support skills**  
+> Tools: ServiceDesk  · Windows 10/11 · Azure AD · TCP/IP · Remote Support
 
 ---
 
 ## 👩‍💻 About This Project
 
-This repository documents my hands-on IT support home lab, where I simulate real-world Tier 1 helpdesk scenarios using **ServiceDesk Plus**. Each ticket follows a professional incident lifecycle: **Log → Categorize → Prioritize → Troubleshoot → Resolve → Document**.
+This repository documents my hands-on IT support home lab, where I simulate real-world Tier 1 helpdesk scenarios using **ServiceDesk**. Each ticket follows a professional incident lifecycle: **Log → Categorize → Prioritize → Troubleshoot → Resolve → Document**.
 
 This project demonstrates:
 - ✅ Ticket creation, management, and resolution
@@ -50,7 +50,7 @@ helpdesk-home-lab/
 
 | Skill | Tool / Method |
 |-------|--------------|
-| Ticketing & Incident Management | ServiceDesk Plus |
+| Ticketing & Incident Management | ServiceDesk |
 | User Account Management | Azure Active Directory |
 | Network Diagnostics | Ping, IPConfig, Tracert, NSLookup |
 | Remote Support | Remote Desktop, Screen Sharing |
