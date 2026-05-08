@@ -7,7 +7,7 @@
 
 ---
 
-## 🎯 Purpose
+##  Purpose
 
 This guide is for IT Support Technicians performing password resets for end users who are locked out of their Windows accounts managed through **Azure Active Directory (Azure AD)**.
 
