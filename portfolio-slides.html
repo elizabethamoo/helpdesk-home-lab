@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Help Desk Home Lab — Elizabeth Amoo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0A0F1E;
+    --navy2: #111827;
+    --teal: #00E5CC;
+    --teal-dim: #00b8a4;
+    --amber: #FFB347;
+    --rose: #FF6B8A;
+    --lavender: #A78BFA;
+    --white: #F0F4FF;
+    --muted: #8B9BB4;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(0,229,204,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    height: 100vh;
+    overflow: hidden;
+    cursor: default;
+  }
+  .deck {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 3rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: all 0.45s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,204,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,204,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* Nav dots */
+  .nav-dots {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dot.active { background: var(--teal); width: 28px; border-radius: 4px; }
+
+  /* Arrows */
+  .arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--teal);
+    font-size: 20px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .arrow:hover { background: rgba(0,229,204,0.1); }
+  .arrow-left { left: 1.5rem; }
+  .arrow-right { right: 1.5rem; }
+
+  /* Slide counter */
+  .counter {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    z-index: 100;
+  }
+  .counter span { color: var(--teal); }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid;
+    margin: 3px;
+  }
+  .tag-teal { border-color: var(--teal); color: var(--teal); }
+  .tag-amber { border-color: var(--amber); color: var(--amber); }
+  .tag-rose { border-color: var(--rose); color: var(--rose); }
+  .tag-lav { border-color: var(--lavender); color: var(--lavender); }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ---- SLIDE 1: Title ---- */
+  #s1 .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  #s1 h1 {
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+  }
+  #s1 h1 span { color: var(--teal); }
+  #s1 .subtitle {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+  #s1 .glow {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,229,204,0.12) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+
+  /* ---- SLIDE 2: About ---- */
+  #s2 .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  #s2 .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  #s2 .stat-num {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1;
+  }
+  #s2 .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ---- SLIDE 3: Skills ---- */
+  #s3 .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  #s3 .skill-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+  #s3 .skill-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  #s3 .skill-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+  #s3 .skill-detail { font-size: 0.75rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* ---- SLIDE 4: Ticket Flow ---- */
+  #s4 .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 2.5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  #s4 .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 110px;
+  }
+  #s4 .step-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 2px solid var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    background: rgba(0,229,204,0.08);
+  }
+  #s4 .step-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.4;
+  }
+  #s4 .arrow-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), transparent);
+    min-width: 24px;
+    margin-bottom: 30px;
+  }
+  #s4 .ticket-ex {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  #s4 .ticket-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  #s4 .ticket-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  #s4 .ticket-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+  #s4 .ticket-meta { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* ---- SLIDE 5: KB ---- */
+  #s5 .kb-list { margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+  #s5 .kb-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+  }
+  #s5 .kb-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--teal);
+    min-width: 36px;
+  }
+  #s5 .kb-title { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+  #s5 .kb-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+  #s5 .kb-tags { margin-top: 8px; }
+
+  /* ---- SLIDE 6: Certs ---- */
+  #s6 .cert-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-top: 2rem;
+  }
+  #s6 .cert-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  #s6 .cert-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  #s6 .cert-card.done::before { background: var(--teal); border: 1px solid var(--teal); }
+  #s6 .cert-card.progress::before { background: linear-gradient(90deg, var(--amber) 60%, transparent); }
+  #s6 .cert-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+  #s6 .cert-status.done { color: var(--teal); }
+  #s6 .cert-status.progress { color: var(--amber); }
+  #s6 .cert-name { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  #s6 .cert-org { font-size: 0.78rem; color: var(--muted); }
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--amber), var(--teal));
+    transition: width 1s ease 0.5s;
+  }
+
+  /* ---- SLIDE 7: CTA ---- */
+  #s7 { text-align: center; align-items: center; }
+  #s7 h2 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; }
+  #s7 h2 span { color: var(--teal); }
+  #s7 .links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  #s7 .link-btn {
+    padding: 0.75rem 1.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  #s7 .link-btn.primary {
+    background: var(--teal);
+    color: var(--navy);
+  }
+  #s7 .link-btn.secondary {
+    background: transparent;
+    color: var(--teal);
+    border: 1px solid var(--teal);
+  }
+  #s7 .link-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+  #s7 .contact-info {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #s7 .contact-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  #s7 .contact-item span { color: var(--white); }
+
+  /* Shared headings */
+  .slide-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  h2.slide-h { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; }
+  .slide-sub {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide active" id="s1">
+    <div class="glow"></div>
+    <div class="eyebrow">IT Support Home Lab Portfolio</div>
+    <h1>Help Desk<br><span>Tier 1</span> Practice<br>Project</h1>
+    <p class="subtitle">A hands-on simulation of real-world IT support workflows using ServiceDesk Plus, Azure AD, and Windows diagnostic tools.</p>
+    <div>
+      <span class="tag tag-teal">ServiceDesk Plus</span>
+      <span class="tag tag-amber">Azure Active Directory</span>
+      <span class="tag tag-rose">TCP/IP · DNS · DHCP</span>
+      <span class="tag tag-lav">Windows 10 / 11</span>
+    </div>
+    <div style="margin-top:2.5rem; font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--muted);">
+      Elizabeth Amoo &nbsp;·&nbsp; Brampton, ON &nbsp;·&nbsp; 2026
+    </div>
+  </div>
+
+  <!-- SLIDE 2: About -->
+  <div class="slide" id="s2">
+    <div class="slide-label">Overview</div>
+    <h2 class="slide-h">What This Project Covers</h2>
+    <p class="slide-sub">A structured simulation of a Tier 1 helpdesk environment, built to demonstrate job-ready IT support skills to Canadian employers.</p>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div style="font-size:0.85rem; font-weight:600; margin-bottom:8px;">🎯 Project Goals</div>
+          <ul style="list-style:none; font-size:0.82rem; color:var(--muted); line-height:2;">
+            <li>→ Simulate real ticket lifecycle end-to-end</li>
+            <li>→ Document using professional IT runbook format</li>
+            <li>→ Practice Azure AD user management</li>
+            <li>→ Build a verifiable, public IT portfolio</li>
+            <li>→ Demonstrate Tier 1 to GRC career path</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="font-size:0.85rem; font-weight:600; margin-bottom:8px;">🛠️ Tools Used</div>
+          <div style="font-family:'DM Mono',monospace; font-size:0.78rem; color:var(--teal); line-height:2;">
+            ServiceDesk Plus · Azure AD Free<br>
+            Windows 11 Pro · Remote Desktop<br>
+            GitHub · Markdown · CMD / PowerShell
+          </div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+        <div class="stat-box"><div class="stat-num">14</div><div class="stat-label">Total Tickets<br>Simulated</div></div>
+        <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Knowledge Base<br>Articles Written</div></div>
+        <div class="stat-box"><div class="stat-num">25m</div><div class="stat-label">Average Ticket<br>Resolution Time</div></div>
+        <div class="stat-box"><div class="stat-num">5</div><div class="stat-label">Ticket<br>Categories</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Skills -->
+  <div class="slide" id="s3">
+    <div class="slide-label">Technical Skills</div>
+    <h2 class="slide-h">Skills Demonstrated</h2>
+    <p class="slide-sub">Each skill was actively applied across one or more tickets in this project.</p>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🎫</div>
+        <div class="skill-name">Ticketing Systems</div>
+        <div class="skill-detail">ServiceDesk Plus<br>Incident lifecycle mgmt</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">👤</div>
+        <div class="skill-name">Identity Management</div>
+        <div class="skill-detail">Azure AD<br>Password resets · MFA</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-name">Network Diagnostics</div>
+        <div class="skill-detail">TCP/IP · DNS · DHCP<br>Ping · Tracert · IPConfig</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🖥️</div>
+        <div class="skill-name">OS Support</div>
+        <div class="skill-detail">Windows 10 / 11<br>System config · User mgmt</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🔌</div>
+        <div class="skill-name">Remote Support</div>
+        <div class="skill-detail">Remote Desktop<br>Screen sharing · Walkthrough</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">📝</div>
+        <div class="skill-name">IT Documentation</div>
+        <div class="skill-detail">Runbooks · KB articles<br>Escalation procedures</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Ticket Flow -->
+  <div class="slide" id="s4">
+    <div class="slide-label">Process</div>
+    <h2 class="slide-h">Ticket Lifecycle</h2>
+    <div class="flow">
+      <div class="step"><div class="step-circle">📥</div><div class="step-label">Receive<br>& Log</div></div>
+      <div class="arrow-line"></div>
+      <div class="step"><div class="step-circle">🔍</div><div class="step-label">Gather<br>Info</div></div>
+      <div class="arrow-line"></div>
+      <div class="step"><div class="step-circle">🔧</div><div class="step-label">Diagnose<br>& Fix</div></div>
+      <div class="arrow-line"></div>
+      <div class="step"><div class="step-circle">⬆️</div><div class="step-label">Escalate<br>if Needed</div></div>
+      <div class="arrow-line"></div>
+      <div class="step"><div class="step-circle">✅</div><div class="step-label">Resolve<br>& Close</div></div>
+      <div class="arrow-line"></div>
+      <div class="step"><div class="step-circle">📖</div><div class="step-label">Document<br>& Learn</div></div>
+    </div>
+    <div class="ticket-ex">
+      <div class="ticket-card">
+        <div class="ticket-id">TKT-001 · 9 min</div>
+        <div class="ticket-title">Password Reset</div>
+        <div class="ticket-meta">Azure AD · Medium priority<br>✅ Resolved Tier 1</div>
+      </div>
+      <div class="ticket-card">
+        <div class="ticket-id">TKT-002 · 35 min</div>
+        <div class="ticket-title">Network Outage</div>
+        <div class="ticket-meta">DHCP failure · High priority<br>⬆️ Escalated Tier 2</div>
+      </div>
+      <div class="ticket-card">
+        <div class="ticket-id">TKT-003 · 43 min</div>
+        <div class="ticket-title">Software Install</div>
+        <div class="ticket-meta">Adobe Acrobat · Low priority<br>✅ Resolved Tier 1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Knowledge Base -->
+  <div class="slide" id="s5">
+    <div class="slide-label">Documentation</div>
+    <h2 class="slide-h">Knowledge Base Articles</h2>
+    <p class="slide-sub">Each article is written so any Tier 1 technician can follow it independently — a core professional skill.</p>
+    <div class="kb-list">
+      <div class="kb-item">
+        <div class="kb-num">01</div>
+        <div>
+          <div class="kb-title">How to Reset a Windows / Azure AD Password</div>
+          <div class="kb-desc">Step-by-step guide for resetting passwords via Azure AD Admin Center and local Windows accounts. Includes identity verification protocol and security best practices.</div>
+          <div class="kb-tags"><span class="tag tag-teal">Azure AD</span><span class="tag tag-amber">Security</span><span class="tag tag-lav">Account Mgmt</span></div>
+        </div>
+      </div>
+      <div class="kb-item">
+        <div class="kb-num">02</div>
+        <div>
+          <div class="kb-title">Network Troubleshooting Steps (Tier 1)</div>
+          <div class="kb-desc">Complete CLI diagnostic workflow: ipconfig, ping, tracert, nslookup. Includes common fixes (flush DNS, renew IP, reset network stack) and escalation decision matrix.</div>
+          <div class="kb-tags"><span class="tag tag-teal">TCP/IP</span><span class="tag tag-rose">DNS · DHCP</span><span class="tag tag-amber">CLI Tools</span></div>
+        </div>
+      </div>
+      <div class="kb-item">
+        <div class="kb-num">03</div>
+        <div>
+          <div class="kb-title">New User IT Onboarding Checklist</div>
+          <div class="kb-desc">Pre-arrival to Day 1 checklist covering Azure AD account creation, Microsoft 365 setup, MFA enrollment, hardware config, and user handover documentation.</div>
+          <div class="kb-tags"><span class="tag tag-lav">Onboarding</span><span class="tag tag-teal">M365</span><span class="tag tag-rose">MFA</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Certs -->
+  <div class="slide" id="s6">
+    <div class="slide-label">Credentials</div>
+    <h2 class="slide-h">Certifications</h2>
+    <p class="slide-sub">Building a verified certification stack aligned with IT Support → GRC career path.</p>
+    <div class="cert-grid">
+      <div class="cert-card done">
+        <div class="cert-status done">✅ COMPLETED</div>
+        <div class="cert-name">Google IT Support Fundamentals</div>
+        <div class="cert-org">Google / Coursera — 2025</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--teal);"></div></div>
+      </div>
+      <div class="cert-card done">
+        <div class="cert-status done">✅ COMPLETED</div>
+        <div class="cert-name">Bits & Bytes of Computer Networking</div>
+        <div class="cert-org">Google / Coursera — 2025</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--teal);"></div></div>
+      </div>
+      <div class="cert-card progress">
+        <div class="cert-status progress">🔄 IN PROGRESS — Target: July 2026</div>
+        <div class="cert-name">CompTIA A+</div>
+        <div class="cert-org">CompTIA — Core 1 + Core 2</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:45%;"></div></div>
+      </div>
+      <div class="cert-card progress">
+        <div class="cert-status progress">🔄 IN PROGRESS — Target: Aug 2026</div>
+        <div class="cert-name">ITIL 4 Foundation</div>
+        <div class="cert-org">PeopleCert / Axelos</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:20%;"></div></div>
+      </div>
+    </div>
+    <div style="margin-top:1.2rem; font-family:'DM Mono',monospace; font-size:0.78rem; color:var(--muted);">
+      Next milestone: CompTIA Security+ → Junior GRC Analyst track (2027)
+    </div>
+  </div>
+
+  <!-- SLIDE 7: CTA -->
+  <div class="slide" id="s7">
+    <div class="slide-label">Contact</div>
+    <h2>Let's <span>Connect</span></h2>
+    <p style="font-size:1rem; color:var(--muted); max-width:500px; line-height:1.7; margin-top:0.5rem;">
+      I'm actively seeking remote Tier 1 IT Support roles in Canada. I bring hands-on home lab practice, strong documentation skills, and a clear career roadmap into GRC and cybersecurity.
+    </p>
+    <div class="links">
+      <a class="link-btn primary" href="https://www.linkedin.com/in/elizabethamoo/" target="_blank">LinkedIn Profile</a>
+      <a class="link-btn secondary" href="https://github.com/" target="_blank">View on GitHub</a>
+      <a class="link-btn secondary" href="mailto:elizabethamoo88@yahoo.ca">Email Me</a>
+    </div>
+    <div class="contact-info">
+      <div class="contact-item">📧 <span>elizabethamoo88@yahoo.ca</span></div>
+      <div class="contact-item">📱 <span>647-745-6453</span></div>
+      <div class="contact-item">📍 <span>Brampton, ON, Canada</span></div>
+    </div>
+  </div>
+
+</div><!-- end deck -->
+
+<!-- Navigation -->
+<button class="arrow arrow-left" onclick="navigate(-1)">&#8592;</button>
+<button class="arrow arrow-right" onclick="navigate(1)">&#8594;</button>
+<div class="nav-dots" id="dots"></div>
+<div class="counter"><span id="cur">1</span> / <span id="tot">7</span></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+  const total = slides.length;
+  document.getElementById('tot').textContent = total;
+
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current >= n ? current : current].classList.remove('exit'), 450);
+    const prev = current;
+    current = Math.max(0, Math.min(total - 1, n));
+    slides[current].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 450);
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    document.getElementById('cur').textContent = current + 1;
+    // trigger progress bars on cert slide
+    if (current === 5) {
+      document.querySelectorAll('.progress-fill').forEach(b => {
+        const w = b.style.width; b.style.width = '0';
+        setTimeout(() => b.style.width = w, 50);
+      });
+    }
+  }
+
+  function navigate(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+  });
+
+  // touch support
+  let touchX = 0;
+  document.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const dx = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) navigate(dx > 0 ? 1 : -1);
+  });
+</script>
+</body>
+</html>
