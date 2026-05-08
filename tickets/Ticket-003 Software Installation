@@ -1,0 +1,103 @@
+# 🎫 Ticket #003 — Software Installation Request
+
+---
+
+## Ticket Details
+
+| Field | Info |
+|-------|------|
+| **Ticket ID** | TKT-003 |
+| **Date Opened** | 2026-04-17 10:05 AM |
+| **Date Closed** | 2026-04-17 10:48 AM |
+| **Priority** | Low |
+| **Category** | Software > Installation |
+| **Status** | ✅ Resolved |
+| **Resolution Time** | 43 minutes |
+
+---
+
+## 📋 User Request
+
+> *"I need Adobe Acrobat Reader installed on my laptop. I tried downloading it myself but I don't have admin rights to install it."*  
+> — **Linda K., HR Department**
+
+---
+
+## 🔍 Step-by-Step Resolution
+
+### Step 1 — Receive & Log the Ticket
+- Ticket received via **ServiceDesk Plus self-service portal**
+- Category: `Software > Installation Request`
+- Priority: `Low` (no business disruption, single user)
+- Assigned to: `Elizabeth Amoo (Tier 1 Technician)`
+
+### Step 2 — Verify Software Approval
+> ⚠️ **Important:** Never install software without checking if it's on the approved software list. Unauthorized software = security risk.
+
+- Checked the **Approved Software Register**
+- **Adobe Acrobat Reader** → ✅ Approved (free, standard business use)
+- No additional manager approval required for this software tier
+
+### Step 3 — Verify User's Machine Details
+- Connected via **Remote Desktop** with user's permission
+- Confirmed OS: Windows 11 Pro (64-bit)
+- Confirmed available disk space: 45 GB free ✅
+- Confirmed no existing Adobe installation
+
+### Step 4 — Download the Software
+```
+Source: https://get.adobe.com/reader/ (official Adobe site only)
+Version: Adobe Acrobat Reader DC (latest)
+File: AcroRdrDC_2400120141_en_US.exe
+File size: 158 MB
+```
+> Always download from the **official vendor website** — never third-party sites
+
+### Step 5 — Install Using Admin Credentials
+Since Linda does not have admin rights:
+1. Right-clicked the installer → **"Run as administrator"**
+2. Entered IT admin credentials (never shared with user)
+3. Accepted Adobe license agreement
+4. Selected installation path: `C:\Program Files\Adobe\`
+5. Unchecked: "Install McAfee Security Scan Plus" (bundled bloatware — always uncheck)
+6. Clicked Install → waited ~8 minutes for completion
+
+### Step 6 — Verify Installation
+```
+Verification steps:
+1. Opened Adobe Acrobat Reader → launched successfully ✅
+2. Opened a test PDF → displayed correctly ✅
+3. Checked Windows Settings > Apps → Adobe listed ✅
+4. Checked version: 24.001.20141 (latest) ✅
+```
+
+### Step 7 — User Confirmation & Training
+- Walked Linda through opening a PDF
+- Showed her how to access from Start Menu and taskbar
+- Confirmed she had no further questions
+- Disconnected remote session
+
+### Step 8 — Close Ticket
+- Updated ServiceDesk with resolution notes
+- Added installed software, version, and date to **Asset Register**
+- Marked ticket: **Resolved**
+
+---
+
+## ✅ Resolution
+
+Adobe Acrobat Reader DC (v24.001.20141) successfully installed on user's Windows 11 laptop using IT admin credentials. User confirmed functionality. Asset register updated.
+
+---
+
+## 📚 Lessons Learned
+
+- Always verify the **approved software list** before installing anything
+- Watch for **bundled bloatware** during installation (McAfee, toolbars, etc.) — always deselect
+- Update the **asset/software register** after every installation — critical for license compliance
+- Never share admin credentials with end users — always use "Run as administrator" yourself
+
+---
+
+## 🔗 Related Knowledge Base Article
+→ [KB-001: New User Onboarding Checklist](../knowledge-base/KB-003-New-User-Onboarding-Checklist.md)
